@@ -1,6 +1,7 @@
 from spoon_install import *
 from spoon_vars import *
 from spoon_manifest import *
+from spoon_networking import *
 import sys
 import os
 def _help():
@@ -37,6 +38,16 @@ def main():
                 if os.path.isfile(pkg):
                     if check_file(pkg):
                         install_manifest(pkg)
+                else:
+                    if not parseurl(pkg):
+                        print(f"* package not found {pkg}")
+                        sys.exit(1)
+                    m = download_manifest(pkg)
+                    if m:
+                        install_manifest(m)
+                    else:
+                        print(f"* package is an url but no manifest was downloaded")
+                        sys.exit(1)
 
         case 'remove':
             if argc == 1:

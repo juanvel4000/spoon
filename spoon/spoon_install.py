@@ -8,12 +8,19 @@ import os
 import shutil
 import time
 def progress_bar(count, block_size, total_size):
-    percent = min(count * block_size / total_size, 1.0)
     bar_length = 40
-    arrow = '=' * int(round(percent * bar_length) - 1) + '>'
+    if total_size == 0:
+        downloaded_kb = count * block_size / 1024
+        sys.stdout.write(f"\r[{'=' * bar_length}] ({downloaded_kb:.2f} KB)")
+        sys.stdout.flush()
+        return
+
+    percent = min(count * block_size / total_size, 1.0)
+    arrow = '=' * max(int(round(percent * bar_length) - 1), 0) + '>'
     spaces = ' ' * (bar_length - len(arrow))
     sys.stdout.write(f"\r[{arrow + spaces}] {int(percent * 100)}%")
     sys.stdout.flush()
+
 def install_manifest(manifest):
     starttime = int(time.time())
     print("* validating manifest")
