@@ -9,7 +9,7 @@ PKG_DIR = os.path.join(SPOON_DIR, 'packages')
 LOCKFILE = os.path.join(SPOON_DIR, 'spoon-lock.json')
 LOCK_BACKUPDIR = os.path.join(SPOON_DIR, 'locks-backup')
 SYMLISTDIR = os.path.join(SPOON_DIR, 'symlist')
-VERSION = "v0.1"
+VERSION = "v0.2"
 for d in [SPOON_DIR, BIN_DIR, PKG_DIR, LOCK_BACKUPDIR, SYMLISTDIR]:
 	os.makedirs(d, exist_ok=True)
 def symlist_add(listn, src, dst):

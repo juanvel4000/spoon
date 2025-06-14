@@ -47,6 +47,7 @@ def main():
         case 'doctor':
             print("* validating lockfile")
             checkLockfile()
+            print("* lockfile looks fine")
         case 'lint':
             if argc == 1:
                 print("usage: lint <manifest>")

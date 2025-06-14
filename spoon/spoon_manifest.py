@@ -17,7 +17,7 @@ def check_contents(jso: str):
     if "url" not in dic:
         # assume that is a script
         if dic['type'] != "script":
-            raise TypeError(f"url not found and type is not a script")
+            raise TypeError("url not found and type is not a script")
         else:
             if 'scripts' not in dic:
                 raise TypeError(f"type is scripts but no scripts found")

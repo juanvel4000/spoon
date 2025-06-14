@@ -6,6 +6,7 @@ from spoon_vars import *
 from spoon_manifest import check_file
 import os
 import shutil
+import time
 def progress_bar(count, block_size, total_size):
     percent = min(count * block_size / total_size, 1.0)
     bar_length = 40
@@ -14,6 +15,7 @@ def progress_bar(count, block_size, total_size):
     sys.stdout.write(f"\r[{arrow + spaces}] {int(percent * 100)}%")
     sys.stdout.flush()
 def install_manifest(manifest):
+    starttime = int(time.time())
     print("* validating manifest")
     if not check_file(manifest):
         return False
@@ -47,9 +49,11 @@ def install_manifest(manifest):
             symlink(src, dst)
             symlist_add(f"{manif['name']}-{manif['version']}", src, dst)
     print("* adding to lockfile")
-    addLockEntry(manif['name'], manif['version']) 
+    addLockEntry(manif['name'], manif['version'])
+    print(f"* done! installed {manif['name']} in {int(time.time()) - starttime}s")
     return True
 def remove_package(name):
+    starttime = int(time.time())
     if not getLockEntry(name):
         return False
     ver = getLockEntry(name)['version']
@@ -62,5 +66,5 @@ def remove_package(name):
             os.remove(os.path.join(BIN_DIR, dst))
     os.remove(os.path.join(SYMLISTDIR, f"{name}-{ver}"))
     if removeLockEntry(name):
-        print(f"* successfully removed {name}")
+        print(f"* done! removed {name} in {int(time.time()) - starttime}s")
         return True
