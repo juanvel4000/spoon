@@ -6,10 +6,11 @@ import os
 def _help():
     print("sophisticated package object obtainer (spoon)")
     print(f"version {VERSION}")
-    print("doctor               -       Check the status of the lockfile")
-    print("lint <manifest>      -       Check for syntax errors in a package manifest")
-    print("help                 -       Show this message")
-    print("remove <packages>    -       Remove a package")
+    print("doctor                   -       Check the status of the lockfile")
+    print("lint <manifest>          -       Check for syntax errors in a package manifest")
+    print("help                     -       Show this message")
+    print("remove <packages>        -       Remove a package")
+    print("install <manifest(s)>    -       Install a package")
     print("spoon is licensed with the MIT license")
     sys.exit(0)
 def main():

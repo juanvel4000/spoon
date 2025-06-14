@@ -30,6 +30,7 @@ def install_manifest(manifest):
     dl = os.path.join(ex, f"{manif['name']}-{manif['version']}.spoon.zip")
     print(f"* downloading {manif['url']}...")
     req.urlretrieve(manif['url'], dl, reporthook=progress_bar)
+    print("\n", end="")
     if not zipfile.is_zipfile(dl):
         return False
     with zipfile.ZipFile(dl, 'r') as zf:
