@@ -29,7 +29,9 @@ Write-Output @"
 * Installer     *
 * * * * * * * * *
 "@
-if (-not Is-PythonInstalled) {
+if (Is-PythonInstalled) {
+	Write-Output @"* found python"
+} else {
 	Write-Output "* installing python 3.13.5"
 	curl -o python-installer.exe https://www.python.org/ftp/python/3.13.5/python-3.13.5-amd64.exe
 	Start-Process .\python-installer.exe -ArgumentList '/quiet', 'InstallAllUsers=0', 'PrependPath=1', 'Include_test=0' -Wait
