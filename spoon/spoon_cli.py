@@ -2,6 +2,7 @@ from spoon_install import *
 from spoon_vars import *
 from spoon_manifest import *
 from spoon_networking import *
+from icecream import *
 import sys
 import os
 def _help():
@@ -21,6 +22,23 @@ def main():
         _help()
     cmd, opts = args[0], args[1:]
     match cmd:
+        case 'icecream':
+            if argc == 1:
+                print("usage: icecream <command> ...")
+                sys.exit(1)
+            acmd = opts[0]
+            match acmd:
+                case 'add':
+                    if argc == 2:
+                        print("usage: icecream add <name> <url>")
+                        sys.exit(1)
+                    if argc == 3:
+                        print(f"usage: icecream add {opts[1]} <url>")
+                        sys.exit(1)
+                    name, url = opts[1], opts[2]
+                    add(url, name)
+                case _:
+                    _help()
         case 'list':
             ents = listEntries()
             if ents == []:
