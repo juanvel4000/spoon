@@ -44,13 +44,22 @@ def install_manifest(manifest):
                 continue
             print(f"* creating link {endp}")
             symlink(src, dst)
+            symlist_add(f"{manif['name']}-{manif['version']}", src, dst)
     print("* adding to lockfile")
     addLockEntry(manif['name'], manif['version']) 
     return True
 def remove_package(name):
     if not getLockEntry(name):
         return False
+    ver = getLockEntry(name)['version']
+    print(f"* removing {name}@{ver}")
     shutil.rmtree(os.path.join(PKG_DIR, name))
-    # TODO: Remove symlinks
+    with open(os.path.join(SYMLISTDIR, f"{name}-{ver}"), 'r') as l:
+        for sym in l.readlines():
+            dst = sym.strip().split('=>')[1]
+            print(f"* removing link {os.path.basename(dst).removesuffix('.bat')}")
+            os.remove(os.path.join(BIN_DIR, dst))
+    os.remove(os.path.join(SYMLISTDIR, f"{name}-{ver}"))
     if removeLockEntry(name):
+        print(f"* successfully removed {name}")
         return True

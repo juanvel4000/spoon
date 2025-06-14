@@ -8,9 +8,13 @@ BIN_DIR = os.path.join(SPOON_DIR, 'bin')
 PKG_DIR = os.path.join(SPOON_DIR, 'packages')
 LOCKFILE = os.path.join(SPOON_DIR, 'spoon-lock.json')
 LOCK_BACKUPDIR = os.path.join(SPOON_DIR, 'locks-backup')
+SYMLISTDIR = os.path.join(SPOON_DIR, 'symlist')
 VERSION = "v0.1"
-for d in [SPOON_DIR, BIN_DIR, PKG_DIR, LOCK_BACKUPDIR]:
+for d in [SPOON_DIR, BIN_DIR, PKG_DIR, LOCK_BACKUPDIR, SYMLISTDIR]:
 	os.makedirs(d, exist_ok=True)
+def symlist_add(listn, src, dst):
+    with open(os.path.join(SYMLISTDIR, listn), 'a') as l:
+        l.write(f'{src}=>{dst}\n')
 def backupCurrentLock(): # this should be called only by the frontend
     shutil.copy(LOCKFILE, os.path.join(LOCK_BACKUPDIR, f'lock-{int(time.time())}.json'))
 def symlink(src, dst):
