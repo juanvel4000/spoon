@@ -30,7 +30,7 @@ Write-Output @"
 * * * * * * * * *
 "@
 if (Is-PythonInstalled) {
-	Write-Output @"* found python"
+	Write-Output "* found python"
 } else {
 	Write-Output "* installing python 3.13.5"
 	curl -o python-installer.exe https://www.python.org/ftp/python/3.13.5/python-3.13.5-amd64.exe
