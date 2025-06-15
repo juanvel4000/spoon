@@ -80,7 +80,7 @@ def install_manifest(manifest, reinstall=False, deps=True):
     ex = os.path.join(PKG_DIR, manif['name'])
     os.makedirs(ex, exist_ok=True)
     dl = os.path.join(ex, f"{manif['name']}-{manif['version']}.spoon-pkg")
-    if manif['dependencies']:
+    if 'dependencies' in manif:
         if deps:
             for dependency in manif['dependencies']:
                 dep = resolve_package(dependency)
