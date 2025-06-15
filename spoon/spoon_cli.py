@@ -3,6 +3,7 @@ from spoon_vars import *
 from spoon_manifest import *
 from spoon_networking import *
 from icecream import *
+from spoon_update import *
 import sys
 import os
 import time
@@ -26,6 +27,14 @@ def main():
         _help()
     cmd, opts = args[0], args[1:]
     match cmd:
+        case 'check-updates':
+            pkgs = getpackagestoupdate()
+            print("* updateable packages")
+            for pkg in pkgs['updateable']:
+                print(f" * {pkg}")
+            print("* up-to-date packages")
+            for pkg in pkgs['non-updateable']:
+                print(f" * {pkg}")
         case 'icecream':
             if argc == 1:
                 print("usage: icecream <command> ...")

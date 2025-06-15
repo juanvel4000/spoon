@@ -5,6 +5,7 @@ from spoon_manifest import *
 import urllib.request
 from urllib.parse import urlparse
 import json
+import spoon_440
 def add(ice_cream, shortname):
     try:
         parsed = urlparse(ice_cream)
