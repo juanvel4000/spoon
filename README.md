@@ -2,6 +2,8 @@
 # 🥄 spoon
 ### (S)ophisticated (P)ackage (O)bject (O)btai(n)er
 
+![GitHub License](https://img.shields.io/github/license/juanvel4000/spoon)
+
 A **sophisticated** package manager for **Windows**, built for those who want a nice package manager with only the essentials.
 ## Installation
 
@@ -56,6 +58,7 @@ Packages can have different types, the current (and only supported type) is
 
 
 ## Ice Cream
+
 
 An ice cream is a collection of manifests, it lets the user easily download manifests without having to write the full url
 
