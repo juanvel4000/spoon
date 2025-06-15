@@ -87,7 +87,8 @@ def resolve_package(name, version=None):
                 "url": known_icecreams[icecream],
                 "name": name,
                 "version": version,
-                "icecream": icecream
+                "icecream": icecream,
+                "full_resolv": f"{known_icecreams[icecream]}/{name}/{version}.json"
                 }
 
     except Exception as e:

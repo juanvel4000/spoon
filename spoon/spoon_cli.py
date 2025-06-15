@@ -90,8 +90,9 @@ def main():
                             version = None
                         netpkg = resolve_package(name, version)   
                         if netpkg:
-                            p = download_manifest(netpkg['url'])
+                            p = download_manifest(netpkg['full_resolv'])
                             install_manifest(p)
+                            sys.exit(1)
                         else:
                             # neither
                             print(f"* package not found {pkg}")
