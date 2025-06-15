@@ -1,5 +1,6 @@
 # spoon_vars: basic variables, functions and lock manipulation
 import os
+import sys
 import json
 import time
 import shutil
@@ -18,6 +19,21 @@ def symlist_add(listn, src, dst):
         l.write(f'{src}=>{dst}\n')
 def backupCurrentLock(): # this should be called only by the frontend
     shutil.copy(LOCKFILE, os.path.join(LOCK_BACKUPDIR, f'lock-{int(time.time())}.json'))
+
+def progress_bar(count, block_size, total_size):
+    bar_length = 40
+    if total_size == 0:
+        downloaded_kb = count * block_size / 1024
+        sys.stdout.write(f"\r[{'=' * bar_length}] ({downloaded_kb:.2f} KB)")
+        sys.stdout.flush()
+        return
+
+    percent = min(count * block_size / total_size, 1.0)
+    arrow = '=' * max(int(round(percent * bar_length) - 1), 0) + '>'
+    spaces = '-' * (bar_length - len(arrow))
+    sys.stdout.write(f"\r[{arrow + spaces}] {int(percent * 100)}%")
+    sys.stdout.flush()
+
 def symlink(src, dst):
     if os.path.exists(dst):
         os.remove(dst)
