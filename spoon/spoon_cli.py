@@ -8,6 +8,23 @@ import sys
 import os
 import time
 import shutil
+import ctypes
+import subprocess
+import platform
+
+def is_20h2_or_newer():
+    version = platform.version()
+    build_number = int(version.split('.')[2])
+    return build_number >= 19042
+if not is_20h2_or_newer():
+    print("* please update to Windows 10 20H2 (Build 19042, October 2020 Update) or Higher")
+    sys.exit(1)
+def is_elevated():
+    return ctypes.windll.shell32.IsUserAnAdmin() != 0
+
+if is_elevated():
+    print("* please run spoon on a regular shell (no admin/uac)")
+    sys.exit(1)
 def list_symlinks(pkg):
     entry = getLockEntry(pkg)
     if not entry:

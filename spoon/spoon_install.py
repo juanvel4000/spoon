@@ -60,7 +60,7 @@ def install_manifest(manifest, reinstall=False):
             print("* package is already installed, use --force to reinstall")
             return False
         else:
-            if os.path.exists(os.path.join(SYMLISTDIR, f"{manif['name']}-{manif['version']}"):
+            if os.path.exists(os.path.join(SYMLISTDIR, f"{manif['name']}-{manif['version']}")):
                 os.remove(os.path.join(SYMLISTDIR, f"{manif['name']}-{manif['version']}"))
 
     print(f"* installing {manif['name']}@{manif['version']}")
