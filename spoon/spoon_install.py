@@ -126,7 +126,10 @@ def remove_package(name):
         for sym in l.readlines():
             dst = sym.strip().split('=>')[1]
             print(f"* removing link {os.path.basename(dst).removesuffix('.bat')}")
-            os.remove(os.path.join(BIN_DIR, dst))
+            if os.path.exists(os.path.join(BIN_DIR, dst)):
+                os.remove(os.path.join(BIN_DIR, dst))
+            else:
+                print(f"* warning, symlink {dst} does not exist")
     os.remove(os.path.join(SYMLISTDIR, f"{name}-{ver}"))
     if removeLockEntry(name):
         print(f"* done! removed {name} in {int(time.time()) - starttime}s")

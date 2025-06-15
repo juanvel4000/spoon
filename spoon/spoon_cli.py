@@ -71,7 +71,7 @@ def loadlock(fil):
             if not any(a['name'] == b['name'] for b in setpkgs):
                 not_inlock.append(a['name'])
         if not_inlock != []:
-            print(f"* {" ".join(not_inlock)")
+            print(f"* {" ".join(not_inlock)}")
             conf = input(f"* the packages above will be removed, do you want to proceed? [y/N]")
             if conf in ['y', 'Y']:
                 for pkg in not_inlock:
