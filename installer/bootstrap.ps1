@@ -42,9 +42,9 @@ $spoonRoot = "$env:USERPROFILE\.spoon"
 $spoonBin  = "$spoonRoot\bin"
 $spoonCode = "$spoonRoot\Spoon"
 
-New-Item -ItemType Directory -Path $spoonRoot -Force
-New-Item -ItemType Directory -Path $spoonBin -Force
-New-Item -ItemType Directory -Path $spoonCode -Force
+New-Item -ItemType Directory -Path $spoonRoot -Force > $null
+New-Item -ItemType Directory -Path $spoonBin -Force > $null
+New-Item -ItemType Directory -Path $spoonCode -Force > $null
 
 Write-Output "* downloading spoon"
 curl -o "$spoonRoot\spoon.zip" https://github.com/juanvel4000/spoon/archive/refs/heads/main.zip
