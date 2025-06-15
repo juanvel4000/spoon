@@ -70,5 +70,6 @@ def synclock(autoyes=True):
             print("* error: package not found in any ice cream")
             continue
         n = download_manifest(net['full_resolv'])
-        install_manifest(n)
+        install_manifest(n, True)
     return True
+

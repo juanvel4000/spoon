@@ -5,12 +5,22 @@ import urllib.request as req
 from spoon_vars import *
 from spoon_manifest import check_file
 import os
+from icecream import *
 import shutil
 import time
 import hashlib
 import subprocess
 import shutil
+import tarfile, lzma
 from spoon_networking import *
+def extract_tar(inp, out):
+    if os.path.isfile(out):
+        return False
+    if not os.path.exists(inp):
+        return False
+    with tarfile.open(inp, 'r:*') as tar:
+        tar.extractall(path=out)
+    return True
 def has_7zr():
     return shutil.which('7zr') is not None
 
@@ -45,7 +55,7 @@ def verify_sum(fil, ssum):
             hasher.update(chunk)
     return hasher.hexdigest() == hhash
 
-def install_manifest(manifest, reinstall=False):
+def install_manifest(manifest, reinstall=False, deps=True):
     starttime = int(time.time())
     print("* validating manifest")
     if not check_file(manifest):
@@ -64,12 +74,26 @@ def install_manifest(manifest, reinstall=False):
                 os.remove(os.path.join(SYMLISTDIR, f"{manif['name']}-{manif['version']}"))
 
     print(f"* installing {manif['name']}@{manif['version']}")
-    if manif['type'] not in ["zip", "exe-static", "msi", "7zr"]:
-        print("* fatal: package is not a zip, msi or exe-static")
+    if manif['type'] not in ["zip", "exe-static", "msi", "7zr", "tarball"]:
+        print("* fatal: package is not a zip, msi, tarball or exe-static")
         return False
     ex = os.path.join(PKG_DIR, manif['name'])
     os.makedirs(ex, exist_ok=True)
     dl = os.path.join(ex, f"{manif['name']}-{manif['version']}.spoon-pkg")
+    if manif['dependencies']:
+        if deps:
+            for dependency in manif['dependencies']:
+                dep = resolve_package(dependency)
+                if not dep:
+                    print(f"* warning: dependency {dependency} not found in any ice cream")
+                    continue
+                m = download_manifest(dep['fullresolv'])
+                if not m:
+                    print(f"* warning: could not download manifest for dependency {manifest}")
+                    continue
+                print(f"installing dependency: {dependency}")
+                install_manifest(m)
+                
     print(f"* downloading {manif['url']}...")
     req.urlretrieve(manif['url'], dl, reporthook=progress_bar)
     print("\n", end="")
@@ -107,7 +131,8 @@ def install_manifest(manifest, reinstall=False):
                 o = download_manifest('https://spoon.juanvel400.xyz/7zr/24.09.json')
                 install_manifest(o)
         extract_7z(dl, ex)
-
+    elif manif['type'] == "tarball":
+        extract_tar(dl, ex)
     # make symlinks
     if 'endpoints' in manif:
         for endp, rel_path in manif['endpoints'].items():

@@ -1,11 +1,9 @@
-from spoon_install import *
 from spoon_networking import *
 from spoon_vars import *
 from spoon_manifest import *
 import urllib.request
 from urllib.parse import urlparse
 import json
-import spoon_440
 import sys
 def add(ice_cream, shortname):
     try:
