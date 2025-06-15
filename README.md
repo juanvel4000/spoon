@@ -5,6 +5,15 @@
 ![GitHub License](https://img.shields.io/github/license/juanvel4000/spoon)
 
 A **sophisticated** package manager for **Windows**, built for those who want a nice package manager with only the essentials.
+## Features
+
+- ***Install/remove** packages from manifests
+- **Ice Creams** are easy to implement
+- **Lock** syncing, dumping and importing
+- **Easy** to use, work with and manage
+- **Script**able and simple
+
+
 ## Installation
 
 Bootstrap spoon using the powershell script

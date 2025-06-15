@@ -7,6 +7,7 @@ from spoon_update import *
 import sys
 import os
 import time
+import shutil
 def dumplock(out):
     print("* reading current lock")
     with open(LOCKFILE, 'r') as lock:
@@ -70,12 +71,12 @@ def main():
                 print(f"├ {i}")
             print(f"└ on {int(time.time()) - starttime}s")
         case 'dump-lock':
-            if args == 1:
+            if argc == 1:
                 print("usage: dump-lock <output>")
                 sys.exit(1)
             dumplock(opts[0])
         case 'load-lock':
-            if args == 1:
+            if argc == 1:
                 print("usage: load-lock <file>")
                 sys.exit(1)
             loadlock(opts[0])
