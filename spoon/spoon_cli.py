@@ -113,7 +113,13 @@ def main():
         case 'doctor':
             print("* validating lockfile")
             checkLockfile()
-            print("* lockfile looks fine")
+            print("* backing up lockfile")
+            backupCurrentLock()
+            print("* success, your spoon is healthy")
+        case 'backup':
+            print("* backing up lock...")
+            backupCurrentLock()
+            print("* lock backed up")
         case 'lint':
             if argc == 1:
                 print("usage: lint <manifest>")

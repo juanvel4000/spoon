@@ -95,4 +95,7 @@ def resolve_package(name, version=None):
         print(f"* error: {e}")
         return False
 
+if not os.path.isfile(os.path.join(ICECREAM_DIR, 'index.json')):
+    add('https://spoon.juanvel400.xyz', 'main')
+
 
