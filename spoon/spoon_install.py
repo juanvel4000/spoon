@@ -156,7 +156,7 @@ def install_manifest(manifest, reinstall=False, deps=True):
     if scripted:
         if 'postinstall' in manif['scripts']:
             print("* running postinstall hooks")
-            print(f" > {manif['scripts']['postinstall']")
+            print(f" > {manif['scripts']['postinstall']}")
             subprocess.run(['powershell', manif['scripts']['postinstall'].strip().split(' ')], shell=True)
     print(f"* done! installed {manif['name']} in {int(time.time()) - starttime}s")
     return True

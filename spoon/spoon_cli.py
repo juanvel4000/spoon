@@ -11,6 +11,22 @@ import shutil
 import ctypes
 import subprocess
 import platform
+import json
+def dump_sample_manifest(out):
+    with open(out + '.json', 'w') as js:
+        json.dump({
+            "name": "sample",
+            "version": "0.1",
+            "maintainer": {"name": "johndoe"},
+            "url": "https://ftp.example.com/sample/v0.1/sample-v0.1-x86_64-windows-msvc.zip",
+            "type": "zip",
+            "sum": "sha256:...",
+            "summary": "sample...",
+            "endpoints": {"sample": "sample/sample.exe"},
+            "homepage": "https://example.com/sample.html",
+
+            }, js, indent=2)
+    check_file(out + '.json')
 def is_20h2_or_newer():
     version = platform.version()
     build_number = int(version.split('.')[2])
@@ -124,6 +140,7 @@ def _help():
     print("refresh                      -       Update the index")
     print("get-paths                    -       Get the paths used by spoon")
     print("links <package>              -       List all the symlinks of a package")
+    print("init <file>                  -       Dump a sample manifest to <file>")
     print("spoon is licensed with the MIT license")
     sys.exit(0)
 def main():
@@ -133,6 +150,11 @@ def main():
         _help()
     cmd, opts = args[0], args[1:]
     match cmd:
+        case 'init':
+            if argc == 1:
+                print("usage: init <file>")
+                sys.exit(1)
+            dump_sample_manifest(opts[0])
         case 'links':
             if argc == 1:
                 print("usage: links <package>")
