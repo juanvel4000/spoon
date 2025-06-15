@@ -210,11 +210,15 @@ def main():
             if argc == 1:
                 print("usage: install <manifest(s)...>")
                 sys.exit(1)
+            reinstall = False
+            if '--force' in opts:
+                opts.remove('--force')
+                reinstall = True
             for pkg in opts:
                 if os.path.isfile(pkg):
                     # is a file
                     if check_file(pkg):
-                        install_manifest(pkg)
+                        install_manifest(pkg, reinstall)
                 else:
                     # is a url to a manifest
                     if not parseurl(pkg):
@@ -228,7 +232,7 @@ def main():
                         netpkg = resolve_package(name, version)   
                         if netpkg:
                             p = download_manifest(netpkg['full_resolv'])
-                            install_manifest(p)
+                            install_manifest(p, reinstall)
                             sys.exit(1)
                         else:
                             # neither
@@ -236,7 +240,7 @@ def main():
                             sys.exit(1)
                     m = download_manifest(pkg)
                     if m:
-                        install_manifest(m)
+                        install_manifest(m, reinstall)
                     else:
                         print(f"* package is an url but no manifest was downloaded")
                         sys.exit(1)

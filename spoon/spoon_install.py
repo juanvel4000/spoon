@@ -45,7 +45,7 @@ def verify_sum(fil, ssum):
             hasher.update(chunk)
     return hasher.hexdigest() == hhash
 
-def install_manifest(manifest):
+def install_manifest(manifest, reinstall=False):
     starttime = int(time.time())
     print("* validating manifest")
     if not check_file(manifest):
@@ -55,6 +55,14 @@ def install_manifest(manifest):
         raise LockfileError("error with the lockfile")
     with open(manifest, 'r') as man:
         manif =  json.load(man)
+    if getLockEntry(manif['name']):
+        if not reinstall:
+            print("* package is already installed, use --force to reinstall")
+            return False
+        else:
+            if os.path.exists(os.path.join(SYMLISTDIR, f"{manif['name']}-{manif['version']}"):
+                os.remove(os.path.join(SYMLISTDIR, f"{manif['name']}-{manif['version']}"))
+
     print(f"* installing {manif['name']}@{manif['version']}")
     if manif['type'] not in ["zip", "exe-static", "msi", "7zr"]:
         print("* fatal: package is not a zip, msi or exe-static")
