@@ -1,9 +1,9 @@
 import urllib.request
-from spoon_install import *
 from spoon_manifest import *
 from spoon_vars import *
 from urllib.parse import urlparse
 import tempfile
+import sys
 def parseurl(url):
     try:
         urlparse(url)

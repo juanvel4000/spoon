@@ -8,6 +8,34 @@ import os
 import shutil
 import time
 import hashlib
+import subprocess
+import shutil
+from spoon_networking import *
+def has_7zr():
+    return shutil.which('7zr') is not None
+
+def extract_7z(archive, outdir):
+    if not has_7zr():
+        print(f"* 7zr not found")
+        return False
+    if not os.path.isfile(archive):
+        print(f"* archive not found: {archive}")
+        return False
+
+    os.makedirs(outdir, exist_ok=True)
+
+    try:
+        print(f"* extracting {archive} to {outdir}")
+        subprocess.run(
+            ['7zr', 'x', archive, f"-o{outdir}", "-y"],
+            check=True,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL
+        )
+        return True
+    except subprocess.CalledProcessError:
+        print("! extraction failed")
+        return False
 
 def progress_bar(count, block_size, total_size):
     bar_length = 40
@@ -42,7 +70,7 @@ def install_manifest(manifest):
     with open(manifest, 'r') as man:
         manif =  json.load(man)
     print(f"* installing {manif['name']}@{manif['version']}")
-    if manif['type'] not in ["zip", "exe-static", "msi"]:
+    if manif['type'] not in ["zip", "exe-static", "msi", "7zr"]:
         print("* fatal: package is not a zip, msi or exe-static")
         return False
     ex = os.path.join(PKG_DIR, manif['name'])
@@ -73,6 +101,19 @@ def install_manifest(manifest):
         args = manif.get("installer_args", "").replace("%TARGETDIR%", ex)
         install_cmd = f'msiexec /i "{newdl}" /quiet /norestart {args}'
         result = os.system(install_cmd)
+
+    elif manif['type'] == "7z":
+        if not has_7zr():
+            i7z = input("* 7zr is not installed, do you want to install it? [Y/n] ")
+            if i7z in ['N', 'n']:
+                print("* package could not be installed because 7z was not found")
+                return False
+            else:
+                print("* installing 7zr...")
+                o = download_manifest('https://spoon.juanvel400.xyz/7zr/24.09.json')
+                install_manifest(o)
+        extract_7z(dl, ex)
+
     # make symlinks
     if 'endpoints' in manif:
         for endp, rel_path in manif['endpoints'].items():
