@@ -8,6 +8,32 @@ import sys
 import os
 import time
 import shutil
+def list_symlinks(pkg):
+    entry = getLockEntry(pkg)
+    if not entry:
+        print("* package is not installed")
+        return False
+
+    version = entry['version']
+    symlist_path = os.path.join(SYMLISTDIR, f"{pkg}-{version}")
+    if not os.path.isfile(symlist_path):
+        print(f"* package does not have a symlist")
+        return False
+
+    with open(symlist_path, 'r') as f:
+        lines = f.readlines()
+
+    print(f"* {pkg}@{version}:")
+    for line in lines:
+        src, dst = line.strip().split('=>')
+        full_src = os.path.normpath(os.path.join(PKG_DIR, pkg, src.strip()))
+        full_dst = os.path.normpath(os.path.join(BIN_DIR, dst.strip()))
+
+        relative_src = os.path.relpath(full_src, os.path.dirname(full_dst))
+        print(f" *  {dst.strip()} -> {relative_src}")
+
+
+                    
 def dumplock(out):
     print("* reading current lock")
     with open(LOCKFILE, 'r') as lock:
@@ -22,6 +48,37 @@ def loadlock(fil):
         print(f"* loading {fil} as lock")
         print("* backing up current lock...")
         backupCurrentLock()
+        print("* looking for differences beetween locks")
+        with open(fil, 'r') as l:
+            newlock = json.load(l)
+        with open(LOCKFILE, 'r') as lo:
+            oldlock = json.load(lo)
+        setpkgs, not_inlock, newpkgs, oldpkgs = [], [], [], []
+
+        for pkg in oldlock['packages']:
+            oldpkgs.append({"name": pkg['name'], "version": pkg['version']})
+
+        for pkg in newlock['packages']:
+            newpkgs.append({"name": pkg['name'], "version": pkg['version']})
+
+
+        for a in newpkgs:
+            for b in oldpkgs:
+                if a['name'] == b['name']:
+                    setpkgs.append({"name": b['name']})
+
+        for a in oldpkgs:
+            if not any(a['name'] == b['name'] for b in setpkgs):
+                not_inlock.append(a['name'])
+        if not_inlock != []:
+            print(f"* {" ".join(not_inlock)")
+            conf = input(f"* the packages above will be removed, do you want to proceed? [y/N]")
+            if conf in ['y', 'Y']:
+                for pkg in not_inlock:
+                    remove_package(pkg)
+            else:
+                print("* cannot proceed")
+                return False
         os.remove(LOCKFILE)
         shutil.copy(fil, LOCKFILE)
         sync = input("* done. do you want to sync the lock? [Y/n]: ")
@@ -50,6 +107,7 @@ def _help():
     print("load-lock <file>             -       Load <file> as a lock")
     print("refresh                      -       Update the index")
     print("get-paths                    -       Get the paths used by spoon")
+    print("links <package>              -       List all the symlinks of a package")
     print("spoon is licensed with the MIT license")
     sys.exit(0)
 def main():
@@ -59,6 +117,12 @@ def main():
         _help()
     cmd, opts = args[0], args[1:]
     match cmd:
+        case 'links':
+            if argc == 1:
+                print("usage: links <package>")
+                sys.exit(1)
+            list_symlinks(opts[0])
+            sys.exit(0)
         case 'refresh':
             dryRun = False
             if '--dry-run' in opts:

@@ -107,10 +107,10 @@ def install_manifest(manifest):
             src = os.path.join(PKG_DIR, manif['name'], rel_path)  
             if not os.path.isfile(src):
                 print(f"* warning: file {src} does not exist")
-                continue
-            print(f"* creating link {endp}")
-            symlink(src, dst)
-            symlist_add(f"{manif['name']}-{manif['version']}", src, dst)
+            else:
+                print(f"* creating link {endp}")
+                symlink(src, dst)
+                symlist_add(f"{manif['name']}-{manif['version']}", src, dst)
     print("* adding to lockfile")
     addLockEntry(manif['name'], manif['version'])
     print(f"* done! installed {manif['name']} in {int(time.time()) - starttime}s")
