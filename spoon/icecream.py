@@ -86,10 +86,12 @@ def resolve_package(name, version=None):
         return {
                 "url": known_icecreams[icecream],
                 "name": name,
-                "version": version
+                "version": version,
+                "icecream": icecream
                 }
 
     except Exception as e:
         print(f"* error: {e}")
+        return False
 
 

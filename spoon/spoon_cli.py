@@ -5,14 +5,18 @@ from spoon_networking import *
 from icecream import *
 import sys
 import os
+import time
 def _help():
     print("sophisticated package object obtainer (spoon)")
     print(f"version {VERSION}")
-    print("doctor                   -       Check the status of the lockfile")
-    print("lint <manifest>          -       Check for syntax errors in a package manifest")
-    print("help                     -       Show this message")
-    print("remove <packages>        -       Remove a package")
-    print("install <manifest(s)>    -       Install a package")
+    print("doctor                       -       Check the status of the lockfile")
+    print("lint <manifest>              -       Check for syntax errors in a package manifest")
+    print("help                         -       Show this message")
+    print("remove <packages>            -       Remove a package")
+    print("list                         -       List installed packages")
+    print("search <package>             -       Search for a package in available ice creams")
+    print("icecream add <name> <url>    -       Add a new ice cream")
+    print("install <package>            -       Install a package from a manifest file, ice cream or manifest url")
     print("spoon is licensed with the MIT license")
     sys.exit(0)
 def main():
@@ -39,27 +43,59 @@ def main():
                     add(url, name)
                 case _:
                     _help()
+        case 'search':
+            if argc == 1:
+                print("usage: search <package(s)...>")
+                sys.exit(1)
+            print("┌found:")
+            starttime = int(time.time())
+            for pkg in opts:
+                if '@' in pkg:
+                    name, version = pkg.split('@')
+                else:
+                    name = pkg
+                    version = None
+                r = resolve_package(name, version)
+                if r:
+                    print(f"├{r['name']}@{r['version']} on {r['icecream']}")
+            print(f"└on {int(time.time()) - starttime}s")
         case 'list':
             ents = listEntries()
             if ents == []:
                 print("* no packages installed")
             else:
-                print("* installed packages")
+                print("┌installed packages")
                 for i in ents:
                     pkg, ver = i['name'], i['version']
-                    print(f"* {pkg}@{ver}")
+                    print(f"├ {pkg}@{ver}")
+                print("└yes")
         case 'install':
             if argc == 1:
                 print("usage: install <manifest(s)...>")
                 sys.exit(1)
             for pkg in opts:
                 if os.path.isfile(pkg):
+                    # is a file
                     if check_file(pkg):
                         install_manifest(pkg)
                 else:
+                    # is a url to a manifest
                     if not parseurl(pkg):
-                        print(f"* package not found {pkg}")
-                        sys.exit(1)
+                        # is a icecream entry
+                        if '@' in pkg:
+                            name, version = pkg.split('@')
+                        else:
+                            name = pkg
+
+                            version = None
+                        netpkg = resolve_package(name, version)   
+                        if netpkg:
+                            p = download_manifest(netpkg['url'])
+                            install_manifest(p)
+                        else:
+                            # neither
+                            print(f"* package not found {pkg}")
+                            sys.exit(1)
                     m = download_manifest(pkg)
                     if m:
                         install_manifest(m)
