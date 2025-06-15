@@ -7,6 +7,8 @@ from spoon_manifest import check_file
 import os
 import shutil
 import time
+import hashlib
+
 def progress_bar(count, block_size, total_size):
     bar_length = 40
     if total_size == 0:
@@ -20,6 +22,14 @@ def progress_bar(count, block_size, total_size):
     spaces = ' ' * (bar_length - len(arrow))
     sys.stdout.write(f"\r[{arrow + spaces}] {int(percent * 100)}%")
     sys.stdout.flush()
+
+def verify_sum(fil, ssum):
+    alg, hhash = ssum.split(':')
+    hasher = getattr(hashlib, alg)()
+    with open(fil, 'rb') as f:
+        while chunk := f.read(8192):
+            hasher.update(chunk)
+    return hasher.hexdigest() == hhash
 
 def install_manifest(manifest):
     starttime = int(time.time())
@@ -40,6 +50,14 @@ def install_manifest(manifest):
     print(f"* downloading {manif['url']}...")
     req.urlretrieve(manif['url'], dl, reporthook=progress_bar)
     print("\n", end="")
+    if manif['sum'] != "skip:x":
+        if verify_sum(dl, manif['sum']):
+            print("* sum is valid")
+        else:
+            print("* sum is not valid")
+            os.remove(dl)
+            sys.exit(1)
+    
     if not zipfile.is_zipfile(dl):
         return False
     with zipfile.ZipFile(dl, 'r') as zf:
