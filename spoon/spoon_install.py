@@ -74,6 +74,13 @@ def install_manifest(manifest, reinstall=False, deps=True):
                 os.remove(os.path.join(SYMLISTDIR, f"{manif['name']}-{manif['version']}"))
 
     print(f"* installing {manif['name']}@{manif['version']}")
+    scripted = False
+    if 'scripts' in manif:
+        scripted = True
+        if 'preinstall' in manif['scripts']:
+            print("* running preinstall hooks")
+            print(f" > {manif['scripts']['preinstall']}")
+            subprocess.run(['powershell', manif['scripts']['preinstall'].strip().split(' ')], shell=True)
     if manif['type'] not in ["zip", "exe-static", "msi", "7zr", "tarball"]:
         print("* fatal: package is not a zip, msi, tarball or exe-static")
         return False
@@ -146,6 +153,11 @@ def install_manifest(manifest, reinstall=False, deps=True):
                 symlist_add(f"{manif['name']}-{manif['version']}", src, dst)
     print("* adding to lockfile")
     addLockEntry(manif['name'], manif['version'])
+    if scripted:
+        if 'postinstall' in manif['scripts']:
+            print("* running postinstall hooks")
+            print(f" > {manif['scripts']['postinstall']")
+            subprocess.run(['powershell', manif['scripts']['postinstall'].strip().split(' ')], shell=True)
     print(f"* done! installed {manif['name']} in {int(time.time()) - starttime}s")
     return True
 def remove_package(name):

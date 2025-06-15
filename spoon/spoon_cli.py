@@ -11,7 +11,6 @@ import shutil
 import ctypes
 import subprocess
 import platform
-
 def is_20h2_or_newer():
     version = platform.version()
     build_number = int(version.split('.')[2])
