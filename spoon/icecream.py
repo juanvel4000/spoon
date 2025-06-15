@@ -6,6 +6,7 @@ import urllib.request
 from urllib.parse import urlparse
 import json
 import spoon_440
+import sys
 def add(ice_cream, shortname):
     try:
         parsed = urlparse(ice_cream)
@@ -13,7 +14,7 @@ def add(ice_cream, shortname):
             raise ValueError("invalid url")
         req = urllib.request.Request(
             ice_cream + '/INDEX.json',
-            headers={"User-Agent": "spoon/0.2 (like uMIS/7)"}
+            headers={"User-Agent": f"spoon/{VERSION} (Python {sys.version})"}
         )
 
 
@@ -71,7 +72,7 @@ def update_index(dryRun=False):
             raise ValueError("invalid url")
         req = urllib.request.Request(
             url + '/INDEX.json',
-            headers={"User-Agent": "spoon/0.2 (like uMIS/7)"}
+            headers={f"User-Agent": f"spoon/{VERSION} (Python {sys.version})"}
         )
 
 
@@ -80,6 +81,7 @@ def update_index(dryRun=False):
         c = json.loads(contents)
         pkgs = c['packages']
         for name, versions in pkgs.items():
+            print(f"* found {name}")
             if name not in final:
                 final[name] = {"versions": versions, "icecream": shortname}
             else:

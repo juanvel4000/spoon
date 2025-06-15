@@ -42,11 +42,12 @@ def install_manifest(manifest):
     with open(manifest, 'r') as man:
         manif =  json.load(man)
     print(f"* installing {manif['name']}@{manif['version']}")
-    if manif['type'] != "zip":
-        return False # only zip is supported for now
+    if manif['type'] not in ["zip", "exe-static", "msi"]:
+        print("* fatal: package is not a zip, msi or exe-static")
+        return False
     ex = os.path.join(PKG_DIR, manif['name'])
     os.makedirs(ex, exist_ok=True)
-    dl = os.path.join(ex, f"{manif['name']}-{manif['version']}.spoon.zip")
+    dl = os.path.join(ex, f"{manif['name']}-{manif['version']}.spoon-pkg")
     print(f"* downloading {manif['url']}...")
     req.urlretrieve(manif['url'], dl, reporthook=progress_bar)
     print("\n", end="")
@@ -57,11 +58,21 @@ def install_manifest(manifest):
             print("* sum is not valid")
             os.remove(dl)
             sys.exit(1)
-    
-    if not zipfile.is_zipfile(dl):
-        return False
-    with zipfile.ZipFile(dl, 'r') as zf:
-        zf.extractall(ex)
+    if manif['type'] == "zip":
+        if not zipfile.is_zipfile(dl):
+            print("this is not a zip file")
+            return False
+        with zipfile.ZipFile(dl, 'r') as zf:
+            zf.extractall(ex)
+    elif manif['type'] == "exe-static":
+        shutil.copy(dl, os.path.join(ex, f"{manif['name']}.exe"))
+    elif manif['type'] == "msi":
+        newdl = os.path.join(ex, f"{manif['name']}-{manif['version']}.msi")
+        os.rename(dl, newdl)
+        print(f"* installing {os.path.basename(newdl)}...")
+        args = manif.get("installer_args", "").replace("%TARGETDIR%", ex)
+        install_cmd = f'msiexec /i "{newdl}" /quiet /norestart {args}'
+        result = os.system(install_cmd)
     # make symlinks
     if 'endpoints' in manif:
         for endp, rel_path in manif['endpoints'].items():
