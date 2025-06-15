@@ -12,7 +12,7 @@ Bootstrap spoon using the powershell script
 It will install `Python` if it is not installed
 
 ```pwsh
-  irm https://raw.githubusercontent.com/juanvel4000/spoon/refs/heads/main/installer/bootstrap.ps1 | iex
+  irm https://spoon.juanvel400.xyz/install.ps1 | iex
 ```
 
 
