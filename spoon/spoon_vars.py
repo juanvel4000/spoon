@@ -28,10 +28,10 @@ class LockfileError(Exception):
 if not os.path.isfile(LOCKFILE):
     with open(LOCKFILE, 'w') as lock:
         json.dump({"packages": []}, lock, indent=2)
-def checkLockfile():
-    if not os.path.isfile(LOCKFILE):
+def checkLockfile(fil=LOCKFILE):
+    if not os.path.isfile(fil):
         raise LockfileError('lockfile does not exist')
-    with open(LOCKFILE, 'r') as lock:
+    with open(fil, 'r') as lock:
         cl = json.load(lock)
     if 'packages' not in cl:
         return False

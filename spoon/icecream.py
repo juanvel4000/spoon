@@ -51,7 +51,47 @@ def add(ice_cream, shortname):
     except Exception as e:
         print(f"* error: {e}")
 
+def update_index(dryRun=False):
+    index = os.path.join(ICECREAM_DIR, 'index.json')
+    known = os.path.join(ICECREAM_DIR, 'known_icecreams')
+    for i in [index, known]:
+        if not os.path.exists(i):
+            print(f"* {i} does not exist, you should add an ice cream")
+            sys.exit(1)
+    with open(index, 'r') as ind:
+        i = json.load(ind)
+    with open(known, 'r') as kno:
+        k = kno.readlines()
+    final = {}
+    for y in k:
+        shortname, url = y.strip().split('@')[0], y.strip().split('@')[1]
+        print(f"* updating {shortname}")
+        parsed = urlparse(url)
+        if not parsed.scheme or not parsed.netloc:
+            raise ValueError("invalid url")
+        req = urllib.request.Request(
+            url + '/INDEX.json',
+            headers={"User-Agent": "spoon/0.2 (like uMIS/7)"}
+        )
 
+
+        with urllib.request.urlopen(req) as response:
+            contents = response.read().decode("utf-8")
+        c = json.loads(contents)
+        pkgs = c['packages']
+        for name, versions in pkgs.items():
+            if name not in final:
+                final[name] = {"versions": versions, "icecream": shortname}
+            else:
+               for ver in versions:
+                    if ver not in final[name]["versions"]:
+                        final[name]["versions"].append(ver)
+    if dryRun:
+        return final
+    with open(index, 'w') as i:
+        json.dump(final, i, indent=2)
+    return final
+        
 def resolve_package(name, version=None):
     try:
         index = os.path.join(ICECREAM_DIR, 'index.json')

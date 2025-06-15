@@ -7,6 +7,30 @@ from spoon_update import *
 import sys
 import os
 import time
+def dumplock(out):
+    print("* reading current lock")
+    with open(LOCKFILE, 'r') as lock:
+        l = lock.read()
+    print(f"* dumping to {out}")
+    with open(out, 'w') as ou:
+        ou.write(l)
+    print("* done!")
+def loadlock(fil):
+    print(f"* checking if {fil} is a valid lock")
+    if checkLockfile(fil):
+        print(f"* loading {fil} as lock")
+        print("* backing up current lock...")
+        backupCurrentLock()
+        os.remove(LOCKFILE)
+        shutil.copy(fil, LOCKFILE)
+        sync = input("* done. do you want to sync the lock? [Y/n]: ")
+        if sync in ['N', 'n']:
+            return True
+        else:
+            if synclock():
+               print("* lock synchronized successfully")
+               return True
+    
 def _help():
     print("sophisticated package object obtainer (spoon)")
     print(f"version {VERSION}")
@@ -17,7 +41,14 @@ def _help():
     print("list                         -       List installed packages")
     print("search <package>             -       Search for a package in available ice creams")
     print("icecream add <name> <url>    -       Add a new ice cream")
+    print("check-updates                -       Check for available package updates")
+    print("update                       -       Update all the packages")
     print("install <package>            -       Install a package from a manifest file, ice cream or manifest url")
+    print("sync-lock                    -       Synchronize packages in the lock")
+    print("dump-lock <output>           -       Dump the current lock to <output>")
+    print("load-lock <file>             -       Load <file> as a lock")
+    print("refresh                      -       Update the index")
+    print("get-paths                    -       Get the paths used by spoon")
     print("spoon is licensed with the MIT license")
     sys.exit(0)
 def main():
@@ -27,6 +58,38 @@ def main():
         _help()
     cmd, opts = args[0], args[1:]
     match cmd:
+        case 'refresh':
+            dryRun = False
+            if '--dry-run' in opts:
+                dryRun = True
+            update_index(dryRun)
+        case 'get-paths':
+            starttime = int(time.time())
+            print("┌ Paths")
+            for i in [SPOON_DIR, BIN_DIR, PKG_DIR, ICECREAM_DIR, SYMLISTDIR, LOCK_BACKUPDIR]:
+                print(f"├ {i}")
+            print(f"└ on {int(time.time()) - starttime}s")
+        case 'dump-lock':
+            if args == 1:
+                print("usage: dump-lock <output>")
+                sys.exit(1)
+            dumplock(opts[0])
+        case 'load-lock':
+            if args == 1:
+                print("usage: load-lock <file>")
+                sys.exit(1)
+            loadlock(opts[0])
+        case 'update':
+            pkgs = getpackagestoupdate()
+            autoyes = False
+            if '-y' in opts:
+                autoyes = True
+            updateallpackages(pkgs['updateable'], autoyes)
+        case 'sync-lock':
+            autoyes = False
+            if '-y' in opts:
+                autoyes = True
+            synclock(autoyes)
         case 'check-updates':
             pkgs = getpackagestoupdate()
             print("* updateable packages")
